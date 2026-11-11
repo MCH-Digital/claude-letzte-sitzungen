@@ -1,0 +1,5 @@
+{
+  "name": "letzte-sitzungen",
+  "owner": { "name": "MCH Digital" },
+  "plugins": [{ "name": "letzte-sitzungen", "source": "./" }]
+}
