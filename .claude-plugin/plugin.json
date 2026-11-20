@@ -1,1 +1,1 @@
-{ "name": "letzte-sitzungen", "version": "0.1.0", "description": "Panel mit den zuletzt aktiven Sitzungen", "types": "./types/index.d.ts" }
+{ "name": "letzte-sitzungen", "version": "0.1.1", "description": "Panel mit den zuletzt aktiven Sitzungen", "types": "./types/index.d.ts" }

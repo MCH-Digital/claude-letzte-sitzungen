@@ -3,7 +3,7 @@ import type { EngineInterface, Register } from 'claude-code'
 import type { Daten, Sitzung } from '../types'
 
 const PANE = 'letzte-sitzungen'
-const ANZAHL = 6
+const ANZAHL = 8
 const LEER: Daten = { rows: [], fehler: '', stand: 0, farben: {} }
 const daten = { plugin: 'letzte-sitzungen', key: 'daten' } as const
 

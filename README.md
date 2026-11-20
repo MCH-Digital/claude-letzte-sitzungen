@@ -1,6 +1,6 @@
 # Letzte Sitzungen
 
-Eine Mod für die Claude-Desktop-App (Code-Tab). Neben dem Chat öffnet sich ein Panel mit den sechs zuletzt aktiven Sitzungen. Wer an mehreren Projekten gleichzeitig arbeitet, findet so die Sitzung mit dem letzten Ergebnis, ohne in der Seitenleiste zu suchen.
+Eine Mod für die Claude-Desktop-App (Code-Tab). Neben dem Chat öffnet sich ein Panel mit den acht zuletzt aktiven Sitzungen. Wer an mehreren Projekten gleichzeitig arbeitet, findet so die Sitzung mit dem letzten Ergebnis, ohne in der Seitenleiste zu suchen.
 
 Jede Sitzung erscheint als farbige Karte mit:
 
