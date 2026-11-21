@@ -4,6 +4,14 @@ import type { Daten, Sitzung } from '../types'
 
 const PANE = 'letzte-sitzungen'
 const ANZAHL = 8
+const RESERVE = 12
+
+// Stille Läufe: Endet eine Sitzung mit einer Claude-Nachricht, die mit „OK:“ beginnt,
+// gab es nichts zu tun (z. B. ein geplanter Lauf ohne Befund). Solche Sitzungen blendet
+// das Panel aus. Läufe mit Problemen enden anders und bleiben sichtbar.
+function istStill(s: Sitzung): boolean {
+  return !s.isRunning && s.zuletzt !== 'du' && (s.vorschau ?? '').startsWith('OK:')
+}
 const LEER: Daten = { rows: [], fehler: '', stand: 0, farben: {} }
 const daten = { plugin: 'letzte-sitzungen', key: 'daten' } as const
 
@@ -86,7 +94,8 @@ function zeitStil(iso: string, jetzt: number): { color?: string; bold?: boolean;
 async function holen($: EngineInterface): Promise<Daten> {
   const stand = await $.clock.now()
   try {
-    const res = await $.mcp.call('ccd_session_mgmt', 'list_sessions', { limit: ANZAHL })
+    // Mehr holen als angezeigt wird, weil stille Läufe („OK:“) danach wegfallen.
+    const res = await $.mcp.call('ccd_session_mgmt', 'list_sessions', { limit: ANZAHL + RESERVE })
     const text = res.content.map(b => (b.type === 'text' ? b.text : '')).join('')
     if (res.isError) return { rows: [], fehler: text || 'Fehler beim Abruf', stand, farben: {} }
     const raw = JSON.parse(text) as Record<string, unknown>[]
@@ -98,7 +107,7 @@ async function holen($: EngineInterface): Promise<Daten> {
       lastActivityAt: String(r.lastActivityAt ?? ''),
       link: typeof r.link === 'string' ? r.link : undefined,
     }))
-    const mitInfos = await mitDetails($, rows)
+    const mitInfos = (await mitDetails($, rows)).filter(r => !istStill(r)).slice(0, ANZAHL)
     const farben = await farbenMerken($, mitInfos.map(r => r.project))
     return { rows: mitInfos, fehler: '', stand, farben }
   } catch (err) {

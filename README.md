@@ -10,6 +10,8 @@ Jede Sitzung erscheint als farbige Karte mit:
 - „? wartet auf dich“, wenn Claude am Ende eine Frage gestellt hat
 - Anfang der letzten Nachricht als Vorschau
 
+Sitzungen, deren letzte Nachricht von Claude mit `OK:` beginnt, blendet das Panel aus. So tauchen geplante Läufe ohne Befund nicht auf: Im Prompt des Laufs festlegen, dass die Schlussnachricht bei normalem Ergebnis mit `OK:` beginnt und bei Problemen anders.
+
 Jedes Projekt bekommt beim ersten Auftauchen eine eigene Farbe und behält sie. Die Zuordnung wird pro Nutzer gespeichert. Die Liste aktualisiert sich alle 30 Sekunden. Mit `/sitzungen` geht das Panel wieder auf, wenn es geschlossen wurde.
 
 Das Öffnen per Klick funktioniert unter Windows.
