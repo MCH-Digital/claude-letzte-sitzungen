@@ -49,6 +49,10 @@ const PALETTE = [
   '#a06450', // Terrakotta
 ]
 const GRAU = '#5f6670' // „ohne Ordner“ und Rückfall
+// Schrift auf den Karten fest hell: Die Kartenfarben sind in beiden Modi gleich
+// mitteldunkel, die Standardschrift wäre im hellen Modus schwarz und schwer lesbar.
+const SCHRIFT = '#f8f8f6'
+const SCHRIFT_LEISE = '#e4e4e0'
 const GRUEN_LAEUFT = '#86efac'
 const GELB_WARTET = '#fde68a'
 const STORE_FARBEN = 'farben'
@@ -81,6 +85,34 @@ function aufhellen(hex: string, anteil: number): string {
   const n = parseInt(hex.slice(1), 16)
   const kanal = (v: number) => Math.round(v + (255 - v) * anteil).toString(16).padStart(2, '0')
   return `#${kanal((n >> 16) & 255)}${kanal((n >> 8) & 255)}${kanal(n & 255)}`
+}
+
+function luminanz(hex: string): number {
+  const n = parseInt(hex.slice(1), 16)
+  const lin = (v: number) => {
+    const c = v / 255
+    return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4
+  }
+  return 0.2126 * lin((n >> 16) & 255) + 0.7152 * lin((n >> 8) & 255) + 0.0722 * lin(n & 255)
+}
+
+// Dunkelt eine Kartenfarbe nur so weit ab, dass die helle Schrift mindestens 4,5:1
+// Kontrast hat. Die gespeicherte Projektfarbe bleibt unverändert.
+function lesbar(hex: string): string {
+  const schrift = luminanz(SCHRIFT)
+  let n = parseInt(hex.slice(1), 16)
+  let r = (n >> 16) & 255
+  let g = (n >> 8) & 255
+  let b = n & 255
+  for (let i = 0; i < 20; i++) {
+    const aktuell = `#${[r, g, b].map(v => v.toString(16).padStart(2, '0')).join('')}`
+    if ((schrift + 0.05) / (luminanz(aktuell) + 0.05) >= 4.5) return aktuell
+    r = Math.round(r * 0.95)
+    g = Math.round(g * 0.95)
+    b = Math.round(b * 0.95)
+  }
+  n = (r << 16) | (g << 8) | b
+  return `#${n.toString(16).padStart(6, '0')}`
 }
 
 // Frisch kräftig, älter als eine Stunde blass.
@@ -227,7 +259,7 @@ export const register: Register = on => {
         {d.fehler !== '' && <Text color="red">Abruf fehlgeschlagen: {d.fehler}</Text>}
         {d.rows.length === 0 && d.fehler === '' && <Text dimColor>Verbinde mit der App …</Text>}
         {d.rows.map(s => {
-          const farbe = farbeFuer(d.farben ?? {}, s.project)
+          const farbe = lesbar(farbeFuer(d.farben ?? {}, s.project))
           const zeit = zeitStil(s.lastActivityAt, d.stand)
           return (
             <Box
@@ -237,16 +269,21 @@ export const register: Register = on => {
               paddingX={1}
               paddingY={1}
               backgroundColor={farbe}
-              hover={{ backgroundColor: aufhellen(farbe, 0.15) }}
+              hover={{ backgroundColor: aufhellen(farbe, 0.08) }}
             >
-              <Button key={`oeffnen-${s.id}`} plain onPress={() => void oeffnen($, s.link)}>
-                {`${s.title}  ↗`}
+              <Button
+                key={`oeffnen-${s.id}`}
+                plain
+                label={`${s.title} öffnen`}
+                onPress={() => void oeffnen($, s.link)}
+              >
+                <Text color={SCHRIFT}>{`${s.title}  ↗`}</Text>
               </Button>
               <Box flexDirection="column" paddingLeft={2}>
-              <Text wrap="truncate-end">
-                <Text bold>{s.project || 'ohne Projekt'}</Text>
-                <Text dimColor>{' · '}</Text>
-                <Text bold={zeit.bold} dimColor={zeit.dim}>
+              <Text wrap="truncate-end" color={SCHRIFT}>
+                <Text bold color={SCHRIFT}>{s.project || 'ohne Projekt'}</Text>
+                <Text color={SCHRIFT_LEISE}>{' · '}</Text>
+                <Text bold={zeit.bold} color={zeit.dim ? SCHRIFT_LEISE : SCHRIFT}>
                   {vor(s.lastActivityAt, d.stand)}
                 </Text>
                 {s.isRunning && (
@@ -261,7 +298,7 @@ export const register: Register = on => {
                 )}
               </Text>
               {s.vorschau && (
-                <Text italic>
+                <Text italic color={SCHRIFT}>
                   {s.zuletzt === 'du' ? 'Du: ' : ''}
                   {s.vorschau}
                 </Text>
