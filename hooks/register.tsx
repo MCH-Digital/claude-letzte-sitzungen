@@ -271,14 +271,16 @@ export const register: Register = on => {
               backgroundColor={farbe}
               hover={{ backgroundColor: aufhellen(farbe, 0.08) }}
             >
-              <Button
-                key={`oeffnen-${s.id}`}
-                plain
-                label={`${s.title} öffnen`}
-                onPress={() => void oeffnen($, s.link)}
-              >
-                <Text color={SCHRIFT}>{`${s.title}  ↗`}</Text>
-              </Button>
+              {/* Der Desktop zeichnet einen Button in seiner eigenen Schriftfarbe, darum
+                  ist der Titel normaler Text und das Öffnen ein eigener Button daneben. */}
+              <Box flexDirection="row" justifyContent="space-between" alignItems="center" gap={1}>
+                <Box flexShrink={1}>
+                  <Text color={SCHRIFT} wrap="truncate-end">
+                    {s.title}
+                  </Text>
+                </Box>
+                <Button key={`oeffnen-${s.id}`} label="Öffnen ↗" onPress={() => void oeffnen($, s.link)} />
+              </Box>
               <Box flexDirection="column" paddingLeft={2}>
               <Text wrap="truncate-end" color={SCHRIFT}>
                 <Text bold color={SCHRIFT}>{s.project || 'ohne Projekt'}</Text>
