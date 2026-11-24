@@ -275,6 +275,9 @@ export const register: Register = on => {
                 key={`oeffnen-${s.id}`}
                 plain
                 label={`${s.title} öffnen`}
+                // Eine feste Farbe nimmt der Desktop für Buttons nicht an, nur eine fürs
+                // Darüberfahren: Solange die Karte unter der Maus ist, wird der Titel weiß.
+                hover={{ color: SCHRIFT }}
                 onPress={() => void oeffnen($, s.link)}
               >
                 <Text color={SCHRIFT}>{`${s.title}  ↗`}</Text>
